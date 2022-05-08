@@ -69,19 +69,19 @@ module.exports = {
               { users: req.params.userId },
               { $pull: { users: req.params.userId } },
               { new: true }
-            )
+            ).then((thought) =>
+            !thought
+              ? res.status(404).json({
+                  message: 'User deleted, but no thoughts found',
+                })
+              : res.json({ message: 'User successfully deleted' })
+          )
+          .catch((err) => {
+            console.log(err);
+            res.status(500).json(err);
+          })
       )
-      .then((thought) =>
-        !thought
-          ? res.status(404).json({
-              message: 'User deleted, but no thoughts found',
-            })
-          : res.json({ message: 'User successfully deleted' })
-      )
-      .catch((err) => {
-        console.log(err);
-        res.status(500).json(err);
-      });
+      
   },
 
   // Add a friend to a user

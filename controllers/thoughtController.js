@@ -57,14 +57,14 @@ module.exports = {
           ? res.status(404).json({ message: 'No thought with that ID' })
           : User.findOneAndUpdate(
             { _id: thought.userId },
-            { $pull: { thoughts: {thoughtId:req.params.thoughtId }} },
+            { $pull: { thought: { thoughtId: req.params.thoughtId } } },
             { runValidators: true, new: true }
             //Need to review this, somehow the thought was not pulled from user document
-          )
+          ).then(() => res.json({ message: 'Thought deleted!' }))
+            .catch((err) => res.status(500).json(err))
         // Student.deleteMany({ _id: { $in: thought.students } })
       )
-      .then(() => res.json({ message: 'Thought and students deleted!' }))
-      .catch((err) => res.status(500).json(err));
+
   },
   // Update a thought
   // What if the username and userID is changed? Not a real world example, so only thoughtText should be updated.
