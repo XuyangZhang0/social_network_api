@@ -57,11 +57,11 @@ module.exports = {
           ? res.status(404).json({ message: 'No thought with that ID' })
           : User.findOneAndUpdate(
             { _id: thought.userId },
-            { $pull: { thoughts: req.params.thoughtId } },
+            { $pull: { thoughts: {thoughtId:req.params.thoughtId }} },
             { runValidators: true, new: true }
             //Need to review this, somehow the thought was not pulled from user document
           )
-          // Student.deleteMany({ _id: { $in: thought.students } })
+        // Student.deleteMany({ _id: { $in: thought.students } })
       )
       .then(() => res.json({ message: 'Thought and students deleted!' }))
       .catch((err) => res.status(500).json(err));
@@ -81,4 +81,32 @@ module.exports = {
       )
       .catch((err) => res.status(500).json(err));
   },
+
+  createReaction(req, res) {
+    Thought.findOneAndUpdate(
+      { _id: req.params.thoughtId },
+      { $addToSet: { reactions: req.body } },
+      { runValidators: true, new: true }
+    )
+      .then((thought) =>
+        !thought
+          ? res.status(404).json({ message: 'No thought with this id!' })
+          : res.json(thought)
+      )
+      .catch((err) => res.status(500).json(err));
+  },
+
+  deleteReaction(req, res) {
+    Thought.findOneAndUpdate(
+      { _id: req.params.thoughtId },
+      { $pull: { reactions: { reactionId: req.params.reactionId } } },
+      { runValidators: true, new: true }
+    )
+      .then((thought) =>
+        !thought
+          ? res.status(404).json({ message: 'No thought with this id!' })
+          : res.json(thought)
+      )
+      .catch((err) => res.status(500).json(err));
+  }
 };
